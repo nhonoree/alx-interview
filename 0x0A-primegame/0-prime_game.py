@@ -1,40 +1,49 @@
 #!/usr/bin/python3
+"""
+0-prime_game.py
+Maria and Ben play a game where they pick prime numbers and remove them
+and their multiples. The player who can't make a move loses.
+"""
+
 
 def sieve(n):
-    """Return a list of primes up to n using Sieve of Eratosthenes"""
-    is_prime = [True for _ in range(n + 1)]
-    is_prime[0:2] = [False, False]  # 0 and 1 are not prime
+    """Generates a list of booleans where True means prime number"""
+    is_prime = [False, False] + [True] * (n - 1)
     for i in range(2, int(n ** 0.5) + 1):
         if is_prime[i]:
-            for multiple in range(i*i, n + 1, i):
-                is_prime[multiple] = False
+            for j in range(i * i, n + 1, i):
+                is_prime[j] = False
     return is_prime
 
+
 def isWinner(x, nums):
-    """Determine the winner of the Prime Game"""
-    if x < 1 or not nums:
+    """
+    Determines the winner of the game after x rounds.
+    Maria always goes first.
+    Returns: name of the player with the most wins or None
+    """
+    if not nums or x < 1:
         return None
 
     max_n = max(nums)
-    primes = sieve(max_n)
+    is_prime = sieve(max_n)
 
-    # Count primes up to each number from 0 to max_n
+    # Precompute number of primes up to each i
     prime_count = [0] * (max_n + 1)
     for i in range(1, max_n + 1):
-        prime_count[i] = prime_count[i - 1] + (1 if primes[i] else 0)
+        prime_count[i] = prime_count[i - 1] + (1 if is_prime[i] else 0)
 
-    maria_wins = 0
-    ben_wins = 0
+    maria_score = 0
+    ben_score = 0
 
     for n in nums:
         if prime_count[n] % 2 == 0:
-            ben_wins += 1
+            ben_score += 1
         else:
-            maria_wins += 1
+            maria_score += 1
 
-    if maria_wins > ben_wins:
+    if maria_score > ben_score:
         return "Maria"
-    elif ben_wins > maria_wins:
+    elif ben_score > maria_score:
         return "Ben"
-    else:
-        return None
+    return None
